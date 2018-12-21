@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:adm="http://github.com/adminfaces"
+	template="/WEB-INF/templates/template.xhtml">
+
+	<ui:define name="title">
+        Cadastro de Itens
+    </ui:define>
+
+	<ui:define name="body">
+		<f:metadata>
+			<f:event type="preRenderView"
+				listener="#{addItemBean.initializerItems()}" />
+		</f:metadata>
+
+		<adm:breadcrumb title="Cadastro Default"
+			link="cadastro-default.xhtml?id=" />
+		<h:form id="form" prependId="false">
+			<p:focus />
+			<p:messages autoUpdate="true" />
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<div id="main-buttons" class="hidden-sm hidden-xs">
+						<p:commandButton value="Salvar" update="itemPanelGrid itemTable"
+							action="#{addItemBean.save()}" icon="fa fa-check"
+							styleClass="btn-primary" />
+					</div>
+					<p:separator />
+
+					<div class="ui-fluid">
+						<h:panelGroup id="itemPanelGrid">
+							<div class="ui-g-12 ui-sm-12 ui-g-nopad">
+								<div class="ui-g-1">
+									<p:outputLabel value="Nome" for="description" />
+								</div>
+								<div class="ui-g-5">
+									<p:inputText id="description"
+										value="#{addItemBean.item.description}" />
+								</div>
+
+								<div class="ui-g-1">
+									<p:outputLabel value="Valor" for="value" />
+								</div>
+								<div class="ui-g-5">
+									<p:inputText id="value" value="#{addItemBean.item.value}" />
+								</div>
+							</div>
+						</h:panelGroup>
+
+
+					</div>
+				</div>
+			</div>
+
+			<h3>Listagem de itens</h3>
+			<p:dataTable id="itemTable" widgetVar="itemTable" rows="10"
+				value="#{addItemBean.items}" var="item"
+				emptyMessage="Nenhum item encontrado" paginator="true"
+				paginatorPosition="bottom">
+				<p:column headerText="Código">
+					<h:outputLabel value="#{item.code}" />
+				</p:column>
+
+				<p:column headerText="Descrição">
+					<h:outputLabel value="#{item.description}" />
+				</p:column>
+
+				<p:column headerText="Valor">
+					<h:outputLabel value="#{item.value}" />
+				</p:column>
+
+				<p:column headerText="Ações">
+					<p:commandButton process="@this" update="itemTable"
+						action="#{addItemBean.remove()}" icon="fa fa-trash"
+						styleClass="btn-danger">
+						<f:setPropertyActionListener value="#{item}"
+							target="#{addItemBean.selectedItem}" />
+					</p:commandButton>
+					<p:commandButton process="@this" update="itemPanelGrid"
+						icon="fa fa-edit" styleClass="btn-primary">
+						<f:setPropertyActionListener value="#{item}"
+							target="#{addItemBean.item}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,135 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:adm="http://github.com/adminfaces"
+	template="/WEB-INF/templates/template.xhtml">
+
+	<ui:define name="head-end">
+		<style type="text/css">
+.ui-grid-row .ui-grid-col-2, .ui-grid-row .ui-grid-col-10 {
+	padding: 0.5em 0;
+	margin-left: 10px;
+}
+
+.ui-orderlist .ui-orderlist-list {
+	height: auto;
+}
+
+.ui-orderlist .ui-grid-row .ui-grid-col-2, .ui-orderlist .ui-grid-row .ui-grid-col-10
+	{
+	padding: 0;
+}
+</style>
+	</ui:define>
+
+	<ui:define name="title">
+        Listagem de Lançamentos
+    </ui:define>
+
+	<ui:define name="body">
+		<adm:breadcrumb title="Listagem" />
+
+		<h:form id="frm">
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<p:commandButton action="/postings/new?faces-redirect=true"
+						ajax="false" icon="fa fa-plus" value="Novo"
+						styleClass="btn-primary" />
+					<p:spacer width="5" />
+                	<p:separator />
+
+					<p:dataTable id="searchPostingTable" widgetVar="searchPostingTable"
+						rows="10" value="#{searchPostingBean.allPostings}" var="posting"
+						emptyMessage="Nenhum item encontrado" paginator="true"
+						paginatorPosition="bottom">
+						
+						<div class="ui-g-1">
+							<p:column headerText="Código">
+								<h:outputLabel value="#{posting.code}" />
+							</p:column>
+						</div>
+						<div class="ui-g-2">
+							<p:column headerText="Data Inicial">
+								<h:outputLabel value="#{posting.initialDate}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</h:outputLabel>
+							</p:column>
+						</div>
+						<div class="ui-g-2">
+							<p:column headerText="Data Final">
+								<h:outputLabel value="#{posting.finalDate}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</h:outputLabel>
+							</p:column>
+						</div>
+						<div class="ui-g-4">
+							<p:column headerText="Descrição">
+								<h:outputLabel value="#{posting.note}" />
+							</p:column>
+						</div>
+
+						<p:column headerText="Ações">
+							<p:commandButton process="@this" oncomplete="PF('dialogPostingItems').show();" icon="fa fa-eye"
+							    update="frm:itemTableDialog" >
+					             <f:setPropertyActionListener value="#{posting}"
+									target="#{searchPostingBean.selectedPosting}" />
+							</p:commandButton>
+							<p:spacer width="5" />
+							<p:button outcome="/postings/new" styleClass="btn btn-info"
+								icon="fa fa-edit " title="Alterar informações">
+								<f:param name="posting" value="#{posting.code}" />
+							</p:button>
+
+							<p:spacer width="5" />
+							<p:commandButton process="@this" update="searchPostingTable"
+								action="#{addPostingBean.removeItem()}" icon="fa fa-trash"
+								styleClass="btn-danger">
+								<f:setPropertyActionListener value="#{item}"
+									target="#{addPostingBean.selectedItem}" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+				</div>
+
+			</div>
+
+			<p:dialog header="Itens do lançamento " id="dialogPostingItems" widgetVar="dialogPostingItems" modal="true" responsive="true"
+				onCloseUpdate="dialogPostingItems" width="70%">
+				
+				<p:messages autoUpdate="false" id="msgDialog" />
+				<div class="card card-w-title">
+					<h3>Listagem de Itens</h3>
+					
+					<p:dataTable id="itemTableDialog" widgetVar="itemTableDialog"
+						rows="5" value="#{searchPostingBean.selectedPosting.items}" var="item"
+						emptyMessage="Não existe itens para este Lançamento" paginator="true"
+						paginatorPosition="bottom">
+
+						<p:column headerText="Código">
+							<h:outputLabel value="#{item.code}" />
+						</p:column>
+
+						<p:column headerText="Descrição">
+							<h:outputLabel value="#{item.description}" />
+						</p:column>
+
+						<p:column headerText="Valor">
+							<h:outputLabel value="#{item.value}" />
+						</p:column>
+
+					<f:facet name="footer">
+					  Valor dos Itens R$ #{searchPostingBean.selectedPosting.amount}
+                 </f:facet>
+					</p:dataTable>
+
+					<div id="main-buttons" class="hidden-sm hidden-xs">
+						<p:commandButton value="Voltar" onclick="PF('dialogPostingItems').hide();" styleClass="btn btn-light"/>
+					</div>
+				</div>
+			</p:dialog>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

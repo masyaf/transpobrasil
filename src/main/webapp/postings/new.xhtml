@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:adm="http://github.com/adminfaces"
+	template="/WEB-INF/templates/template.xhtml">
+
+	<ui:define name="title">
+        #{addPostingBean.editing ? 'Edição de Lançamento' : 'Novo Lançamento'}
+    </ui:define>
+
+	<ui:define name="body">
+		<f:metadata>
+			<o:viewParam name="posting" value="#{addPostingBean.posting}" />
+		</f:metadata>
+
+		<adm:breadcrumb title="Adicionar Novo"
+			link="/postings/new.xhtml?id=" />
+		<h:form id="form" prependId="false">
+			<p:focus />
+			<p:messages autoUpdate="false" id="msg" />
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<div id="main-buttons" class="hidden-sm hidden-xs">
+						<p:commandButton value="#{addPostingBean.editing ? 'Atualizar' : 'Salvar'}"
+							update="msg postingPanelGrid postingItemTable"
+							action="#{addPostingBean.save()}" icon="fa fa-check"
+							styleClass="btn-primary" />
+
+						<p:commandButton value="Vincular Itens" process="@this"
+							actionListener="#{addPostingBean.initializerItems()}"
+							oncomplete="PF('dialogAddItems').show();" icon="ui-icon-document"
+							update="msg dialogAddItems" />
+					</div>
+					<p:separator />
+
+					<div class="ui-fluid">
+						<h:panelGroup id="postingPanelGrid">
+							<div class="ui-g-12 ui-sm-12 ui-g-nopad">
+								<div class="ui-g-1">
+									<p:outputLabel value="Data Inicial" for="initialDate" />
+								</div>
+								<div class="ui-g-5">
+									<p:calendar id="initialDate"
+										value="#{addPostingBean.posting.initialDate}" locale="br" pattern="dd/MM/yyyy"/>
+								</div>
+
+								<div class="ui-g-1">
+									<p:outputLabel value="Data Final" for="finalDate"  />
+								</div>
+								<div class="ui-g-5">
+									<p:calendar id="finalDate"
+										value="#{addPostingBean.posting.finalDate}" pattern="dd/MM/yyyy" />
+								</div>
+
+								<div class="ui-g-1">
+									<p:outputLabel value="Descrição" for="description" />
+								</div>
+								<div class="ui-g-11">
+									<p:inputTextarea rows="3" id="description"
+										value="#{addPostingBean.posting.note}" />
+								</div>
+							</div>
+						</h:panelGroup>
+
+
+					</div>
+				</div>
+			</div>
+
+				<h3>Listagem de itens</h3>
+				<p:dataTable id="postingItemTable" widgetVar="postingItemTable"
+					rows="10" value="#{addPostingBean.posting.items}" var="item"
+					emptyMessage="Nenhum item encontrado" paginator="true"
+					paginatorPosition="bottom">
+
+					<p:column headerText="Código">
+						<h:outputLabel value="#{item.code}" />
+					</p:column>
+
+					<p:column headerText="Descrição">
+						<h:outputLabel value="#{item.description}" />
+					</p:column>
+
+					<p:column headerText="Valor">
+						<h:outputLabel value="#{item.value}" />
+					</p:column>
+
+					<p:column headerText="Ações">
+						<p:commandButton process="@this"
+							update="postingItemTable" action="#{addPostingBean.removeItem()}"
+							icon="fa fa-trash" styleClass="btn-danger">
+							<f:setPropertyActionListener value="#{item}"
+								target="#{addPostingBean.selectedItem}" />
+						</p:commandButton>
+					</p:column>
+					<f:facet name="footer">
+                      Total Itens R$ #{addPostingBean.posting.amount}
+                 </f:facet>
+				</p:dataTable>
+
+
+			<p:dialog header="Vincular Itens " id="dialogAddItems"
+				widgetVar="dialogAddItems" modal="true" responsive="true"
+				onCloseUpdate="postingItemTable" width="70%">
+				    <p:messages autoUpdate="false" id="msgDialog"/>
+					<div class="card card-w-title">
+						<h3>Listagem de Itens</h3>
+						<p:dataTable id="itemTableDialog" widgetVar="itemTableDialog"
+							rows="5" value="#{addPostingBean.allItems}" var="item"
+							emptyMessage="Não existe itens cadastrados" paginator="true"
+							paginatorPosition="bottom">
+
+							<p:column headerText="Código">
+								<h:outputLabel value="#{item.code}" />
+							</p:column>
+
+							<p:column headerText="Descrição">
+								<h:outputLabel value="#{item.description}" />
+							</p:column>
+
+							<p:column headerText="Valor">
+								<h:outputLabel value="#{item.value}" />
+							</p:column>
+
+							<p:column headerText="Ações">
+								<p:commandButton value="Adicionar" process="@this"
+									action="#{addPostingBean.addItem()}" update="msgDialog postingItemTable"
+									 styleClass="btn-primary">
+									<f:setPropertyActionListener value="#{item}"
+										target="#{addPostingBean.selectedItem}" />
+								</p:commandButton>
+							</p:column>
+
+
+						</p:dataTable>
+
+						<div id="main-buttons" class="hidden-sm hidden-xs">
+								<p:commandButton value="Voltar"
+									onclick="PF('dialogAddItems').hide();"
+									styleClass="btn btn-light" update="msg postingItemTable">
+								</p:commandButton>
+							</div>
+						</div>
+			</p:dialog>
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>
